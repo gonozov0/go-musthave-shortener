@@ -19,18 +19,18 @@ func NewRootHandler() RootHandler {
 		urlCount: 0,
 	}
 }
-func (h *RootHandler) createShortUrl(longUrl string) string {
-	shortUrl := strconv.Itoa(int(h.urlCount))
-	h.urlMap[shortUrl] = longUrl
+func (h *RootHandler) createShortURL(longURL string) string {
+	shortURL := strconv.Itoa(int(h.urlCount))
+	h.urlMap[shortURL] = longURL
 	h.urlCount++
-	return shortUrl
+	return shortURL
 }
-func (h *RootHandler) getLongUrl(shortUrl string) (string, error) {
-	longUrl, ok := h.urlMap[shortUrl]
+func (h *RootHandler) getLongURL(shortURL string) (string, error) {
+	longURL, ok := h.urlMap[shortURL]
 	if !ok {
 		return "", fmt.Errorf("short url doesn't exist")
 	}
-	return longUrl, nil
+	return longURL, nil
 }
 func (h *RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -41,16 +41,16 @@ func (h *RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), 500)
 			return
 		}
-		shortUrl := h.createShortUrl(string(b))
+		shortURL := h.createShortURL(string(b))
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(shortUrl))
+		w.Write([]byte(shortURL))
 	case http.MethodGet:
-		shortUrl := strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/"), "/")
-		longUrl, err := h.getLongUrl(shortUrl)
+		shortURL := strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/"), "/")
+		longURL, err := h.getLongURL(shortURL)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
-		w.Header().Set("Location", longUrl)
+		w.Header().Set("Location", longURL)
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
